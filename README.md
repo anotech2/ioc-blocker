@@ -1,29 +1,95 @@
+# Build an Automated IOC Blocker for Palo Alto NGFW — End‑to‑End Guide (Step‑by‑Step)
+
+## README for GitHub Repository
+
+````markdown
 # IOC Blocker for Palo Alto NGFW
 
-Automates the ingestion of **malicious IP indicators** from multiple OSINT sources, optionally **enriches** with VirusTotal, and **enforces blocks** on a Palo Alto Networks firewall using a **Dynamic Address Group (DAG)** and a deny policy. Designed for SOC/Blue-Team workflows in both **lab** and **production**.
-
----
+Automates the ingestion of **malicious IP indicators** from multiple OSINT sources, optionally enriches with VirusTotal, and enforces blocks on a Palo Alto Networks firewall using a **Dynamic Address Group (DAG)** and a deny policy.
 
 ## Features
-
-- **OSINT feeds** out of the box: Spamhaus DROP/eDROP, Emerging Threats compromised, DShield Top.
-- **Optional sources**: AbuseIPDB, AlienVault OTX, local Excel list.
-- **VirusTotal enrichment** (configurable thresholds): keep only high-confidence bad IPs.
+- **OSINT feeds**: Spamhaus DROP/eDROP, Emerging Threats, DShield Top, optional AbuseIPDB & AlienVault OTX
+- **VirusTotal enrichment** (configurable thresholds)
 - **Two modes**:
-  - **objects** – creates Address Objects tagged `malicious` (supports CIDRs; requires commit).
-  - **user-id** – registers IP→tag via User-ID (no commit; IPs only; fast churn).
-- **Idempotent**: ensures tag/DAG/policy exist and only applies deltas.
-- **Verification**: checks candidate & running config; can query DAG members.
-- **24/7**: simple loop runner (`service.py`), cron, or systemd.
+  - **objects**: creates Address Objects (supports CIDRs; requires commit)
+  - **user-id**: registers IP→tag (no commit; IPs only; fast churn)
+- **Idempotent**: ensures tag/DAG/rule exist, applies only deltas
+- **Verification**: checks candidate & running config; query DAG members
+- **Scheduler**: run once or continuously (`service.py`, cron, or systemd)
 
----
+## Quick Start
+
+### Clone and setup
+```bash
+git clone https://github.com/anotech2/ioc-blocker.git
+cd ioc-blocker
+python -m venv .venv
+# On Windows
+.venv\Scripts\activate
+# On macOS/Linux
+source .venv/bin/activate
+pip install -r requirements.txt
+````
+
+### Configure
+
+Copy `.env.example` to `.env` and fill in with firewall details and API keys:
+
+```bash
+cp .env.example .env
+```
+
+### Run once
+
+```bash
+python run_once.py
+```
+
+### Run continuously
+
+```bash
+python service.py
+```
+
+## Folder Layout
+
+```
+ioc-blocker/
+├─ panos_api.py       # PAN-OS XML API helper
+├─ run_once.py        # Pipeline: feeds → enrich → update firewall
+├─ service.py         # Loop scheduler
+├─ vt_enrich.py       # VirusTotal helpers
+├─ ioc_sources/       # Feed collectors
+├─ feeds.yaml         # Feed toggles + thresholds
+├─ requirements.txt   # Dependencies
+├─ .env.example       # Safe config template
+└─ .gitignore         # Ensures .env is ignored
+```
+
+## Security Notes
+
+* **Never commit `.env`** (secrets)
+* Use least-privilege firewall credentials
+* Enable TLS verification in production (`PAN_VERIFY=true`)
+
+## License
+
+MIT License — see LICENSE
+
+````
+
+## Introduction
 
 ## Architecture (high level)
 
 ```mermaid
 flowchart LR
-    A[Feeds] --> B[Collector & Dedupe]
-    B --> C[Optional VT Enrichment]
-    C --> D[Final IOC Set]
-    D -->|mode=objects| E[Address Objects + tag=malicious] --> F[DAG(filter='malicious')] --> G[Deny Rule]
-    D -->|mode=user-id| H[User-ID Register IP→tag] --> F
+  A[OSINT Feeds] --> B[Collect and Dedupe]
+  B --> C[VirusTotal Enrichment optional]
+  C --> D[Final IOC Set]
+  D -->|objects| E[Address Objects tag malicious]
+  E --> F[DAG filter malicious]
+  F --> G[Deny Policy]
+  D -->|user-id| H[User-ID IP-to-tag]
+  H --> F
+````
