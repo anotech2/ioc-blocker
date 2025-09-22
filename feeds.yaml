@@ -1,0 +1,20 @@
+threshold:
+  vt_malicious_min: 5
+  vt_suspicious_min: 0
+
+providers:
+  spamhaus_drop: true
+  spamhaus_edrop: true
+  emerging_threats: true
+  dshield_top: true
+  excel_local: false
+
+  abuseipdb:
+    enabled: false
+    confidence_min: 75
+    days: 7
+    limit: 500
+
+  otx:
+    enabled: false
+    section: "IPv4"
