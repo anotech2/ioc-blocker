@@ -20,6 +20,7 @@ Automates the ingestion of **malicious IP indicators** from multiple OSINT sourc
 
 ## Architecture (high level)
 
+```mermaid
 flowchart LR
     A[Feeds] --> B[Collector & Dedupe]
     B --> C[Optional VT Enrichment]
