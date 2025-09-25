@@ -1,8 +1,5 @@
 # Build an Automated IOC Blocker for Palo Alto NGFW — End‑to‑End Guide (Step‑by‑Step)
 
-## README for GitHub Repository
-
-
 ## **IOC Blocker for Palo Alto NGFW**
 
 Automates the ingestion of **malicious IP indicators** from multiple OSINT sources, optionally enriches with VirusTotal, and enforces blocks on a Palo Alto Networks firewall using a **Dynamic Address Group (DAG)** and a deny policy.
