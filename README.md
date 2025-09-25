@@ -2,8 +2,8 @@
 
 ## README for GitHub Repository
 
-````markdown
-# IOC Blocker for Palo Alto NGFW
+
+## **IOC Blocker for Palo Alto NGFW**
 
 Automates the ingestion of **malicious IP indicators** from multiple OSINT sources, optionally enriches with VirusTotal, and enforces blocks on a Palo Alto Networks firewall using a **Dynamic Address Group (DAG)** and a deny policy.
 
@@ -72,24 +72,7 @@ ioc-blocker/
 * Use least-privilege firewall credentials
 * Enable TLS verification in production (`PAN_VERIFY=true`)
 
-## License
+**Check the below link for step by step guidance.**
 
-MIT License — see LICENSE
+https://medium.com/@ano.tech2/automated-ioc-blocker-for-palo-alto-ngfw-f55728743295
 
-````
-
-## Introduction
-
-## Architecture (high level)
-
-```mermaid
-flowchart LR
-  A[OSINT Feeds] --> B[Collect and Dedupe]
-  B --> C[VirusTotal Enrichment optional]
-  C --> D[Final IOC Set]
-  D -->|objects| E[Address Objects tag malicious]
-  E --> F[DAG filter malicious]
-  F --> G[Deny Policy]
-  D -->|user-id| H[User-ID IP-to-tag]
-  H --> F
-````
